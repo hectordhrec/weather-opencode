@@ -9,12 +9,17 @@
 
 ## Project Structure
 
-- Single-file app: `index.ts` (entry point). No `src/` or `lib/` directories.
+- Entry point: `index.ts`. Helpers in `lib/` (`api.ts`, `storage.ts`, `readline.ts`, `ui.ts`).
 - ESM (`"type": "module"`). Strict TypeScript with `verbatimModuleSyntax` — use explicit `type` keyword on type-only imports.
 
 ## Commands
 
 No scripts defined in `package.json` yet. Use direct Bun commands above.
+
+## Config & Persistence
+
+- App stores data in `~/.config/weather-cli/config.json` (cities, default city, temperature units).
+- Uses `node:fs`, `node:path`, `node:os` for config management — no external storage libraries.
 
 ## API
 
@@ -30,4 +35,4 @@ No scripts defined in `package.json` yet. Use direct Bun commands above.
 
 ## Status
 
-Scaffolded only (`bun init`). No app logic, tests, linter, or CI configured yet.
+CLI weather app implemented. No tests, linter, or CI configured yet.
