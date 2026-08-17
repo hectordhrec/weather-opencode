@@ -63,7 +63,7 @@ async function handleAllCitiesWeather(config: Config): Promise<void> {
     spinStop();
     if (temp !== null) {
       const def = city.name === config.defaultCity ? " ★" : "";
-      showWeather(`${city.name}${def}`, formatTemp(temp, config.units));
+      showWeather(`${formatLocation(city)}${def}`, formatTemp(temp, config.units));
     } else {
       console.log(red(`  ${city.name}: Error al obtener clima`));
     }
@@ -137,7 +137,7 @@ async function handleDeleteCity(config: Config): Promise<Config> {
   console.log("\n  Ciudades registradas:");
   config.cities.forEach((c, i) => {
     const def = c.name === config.defaultCity ? " (default)" : "";
-    console.log(`    ${i + 1}. ${c.name}${def}`);
+    console.log(`    ${i + 1}. ${formatLocation(c)}${def}`);
   });
 
   const input = await prompt("\n  Número de la ciudad a eliminar: ");
@@ -152,12 +152,12 @@ async function handleDeleteCity(config: Config): Promise<Config> {
   if (config.defaultCity === removed.name) {
     config.defaultCity = config.cities.length > 0 ? config.cities[0]!.name : null;
     if (config.defaultCity) {
-      console.log(green(`  ✓ "${removed.name}" eliminada. Default ahora: ${config.defaultCity}\n`));
+      console.log(green(`  ✓ "${formatLocation(removed)}" eliminada. Default ahora: ${config.defaultCity}\n`));
     } else {
-      console.log(green(`  ✓ "${removed.name}" eliminada. No hay default.\n`));
+      console.log(green(`  ✓ "${formatLocation(removed)}" eliminada. No hay default.\n`));
     }
   } else {
-    console.log(green(`  ✓ "${removed.name}" eliminada.\n`));
+    console.log(green(`  ✓ "${formatLocation(removed)}" eliminada.\n`));
   }
 
   await saveConfig(config);
@@ -173,7 +173,7 @@ async function handleSetDefault(config: Config): Promise<Config> {
   console.log("\n  Ciudades disponibles:");
   config.cities.forEach((c, i) => {
     const def = c.name === config.defaultCity ? " (actual default)" : "";
-    console.log(`    ${i + 1}. ${c.name}${def}`);
+    console.log(`    ${i + 1}. ${formatLocation(c)}${def}`);
   });
 
   const input = await prompt("\n  Número de la nueva ciudad default: ");
