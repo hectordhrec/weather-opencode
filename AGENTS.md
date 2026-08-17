@@ -9,7 +9,7 @@
 
 ## Project Structure
 
-- Entry point: `index.ts`. Helpers in `lib/` (`api.ts`, `storage.ts`, `readline.ts`, `ui.ts`).
+- Entry point: `index.ts`. Modules in `src/` (`types.ts`, `storage.ts`, `geocoding.ts`, `forecast.ts`, `readline.ts`, `menu.ts`).
 - ESM (`"type": "module"`). Strict TypeScript with `verbatimModuleSyntax` — use explicit `type` keyword on type-only imports.
 
 ## Commands

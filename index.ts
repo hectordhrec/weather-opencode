@@ -1,25 +1,10 @@
-import { prompt } from "./lib/readline";
-import { getConfigPath, loadJson, saveJson } from "./lib/storage";
-import { geocode, getWeather } from "./lib/api";
-import { showMenu, showWeather } from "./lib/ui";
-
-interface City {
-  name: string;
-  latitude: number;
-  longitude: number;
-}
-
-interface Config {
-  cities: City[];
-  defaultCity: string | null;
-  units: "celsius" | "fahrenheit";
-}
-
-const DEFAULT_CONFIG: Config = {
-  cities: [],
-  defaultCity: null,
-  units: "celsius",
-};
+import type { Config } from "./src/types";
+import { DEFAULT_CONFIG } from "./src/types";
+import { getConfigPath, loadJson, saveJson } from "./src/storage";
+import { prompt } from "./src/readline";
+import { geocode } from "./src/geocoding";
+import { getWeather } from "./src/forecast";
+import { showMenu, showWeather } from "./src/menu";
 
 async function loadConfig(): Promise<Config> {
   const configPath = getConfigPath("config.json");
