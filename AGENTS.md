@@ -9,7 +9,7 @@
 
 ## Project Structure
 
-- Entry point: `index.ts`. Modules in `src/` (`types.ts`, `storage.ts`, `geocoding.ts`, `forecast.ts`, `readline.ts`, `menu.ts`).
+- Entry point: `index.ts`. Modules in `src/` (`types.ts`, `storage.ts`, `geocoding.ts`, `forecast.ts`, `readline.ts`, `menu.ts`, `colors.ts`).
 - ESM (`"type": "module"`). Strict TypeScript with `verbatimModuleSyntax` — use explicit `type` keyword on type-only imports.
 
 ## Commands
@@ -32,6 +32,7 @@ No scripts defined in `package.json` yet. Use direct Bun commands above.
 - TypeScript strict mode with `noFallthroughCasesInSwitch`, `noUncheckedIndexedAccess`, `noImplicitOverride` enabled.
 - Target: ESNext, module resolution: bundler mode.
 - Cursor rules in `.cursor/rules/` enforce Bun-native patterns — follow them.
+- **Colores ANSI** en `src/colors.ts`: `cyan()` (menú), `yellow()` (temperatura), `green()` (éxito ✓), `red()` (error ⚠). Sin dependencias externas.
 
 ## Status
 

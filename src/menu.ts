@@ -1,8 +1,10 @@
+import { cyan, yellow } from "./colors";
+
 const LINE = "═".repeat(40);
 
 export function showMenu(cityCount: number, units: string): void {
   const unitLabel = units === "celsius" ? "°C" : "°F";
-  console.log(`
+  console.log(cyan(`
 ${LINE}
          WEATHER CLI
 ${LINE}
@@ -13,9 +15,9 @@ ${LINE}
   5. Establecer ciudad default
   8. Ajustes (${unitLabel})
   9. Salir
-${LINE}`);
+${LINE}`));
 }
 
 export function showWeather(city: string, temp: string): void {
-  console.log(`  Clima en ${city}: ${temp}`);
+  console.log(`  Clima en ${city}: ${yellow(temp)}`);
 }
