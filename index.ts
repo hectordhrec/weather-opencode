@@ -1,4 +1,4 @@
-import type { Config } from "./src/types";
+import type { City, Config } from "./src/types";
 import { DEFAULT_CONFIG } from "./src/types";
 import { getConfigPath, loadJson, saveJson } from "./src/storage";
 import { prompt } from "./src/readline";
@@ -23,6 +23,13 @@ function formatTemp(celsius: number, units: string): string {
     return `${((celsius * 9) / 5 + 32).toFixed(1)}°F`;
   }
   return `${celsius.toFixed(1)}°C`;
+}
+
+function formatLocation(city: City): string {
+  const parts = [city.name];
+  if (city.admin1) parts.push(city.admin1);
+  if (city.country) parts.push(city.country);
+  return parts.join(", ");
 }
 
 async function handleDefaultWeather(config: Config): Promise<void> {
@@ -69,31 +76,50 @@ async function handleAddCity(config: Config): Promise<Config> {
   }
 
   console.log(`  Buscando "${name}"...`);
-  const result = await geocode(name.trim());
-  if (!result) {
+  const results = await geocode(name.trim());
+  if (results.length === 0) {
     console.log(red("  ⚠ Ciudad no encontrada.\n"));
     return config;
   }
 
+  let selected: City;
+  if (results.length === 1) {
+    selected = results[0]!;
+  } else {
+    console.log(`\n  Se encontraron varias ciudades:`);
+    results.forEach((c, i) => {
+      console.log(`    ${i + 1}. ${formatLocation(c)}`);
+    });
+    const input = await prompt("\n  Selecciona una opción: ");
+    const idx = parseInt(input, 10) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= results.length) {
+      console.log(red("  ⚠ Opción no válida.\n"));
+      return config;
+    }
+    selected = results[idx]!;
+  }
+
   const exists = config.cities.some(
-    (c) => c.name.toLowerCase() === result.name.toLowerCase()
+    (c) => c.name.toLowerCase() === selected!.name.toLowerCase()
   );
   if (exists) {
-    console.log(red(`  ⚠ "${result.name}" ya está registrada.\n`));
+    console.log(red(`  ⚠ "${selected!.name}" ya está registrada.\n`));
     return config;
   }
 
   config.cities.push({
-    name: result.name,
-    latitude: result.latitude,
-    longitude: result.longitude,
+    name: selected!.name,
+    latitude: selected!.latitude,
+    longitude: selected!.longitude,
+    country: selected!.country,
+    admin1: selected!.admin1,
   });
 
   if (config.cities.length === 1) {
-    config.defaultCity = result.name;
-    console.log(green(`  ✓ "${result.name}" agregada como ciudad por defecto.\n`));
+    config.defaultCity = selected!.name;
+    console.log(green(`  ✓ "${formatLocation(selected!)}" agregada como ciudad por defecto.\n`));
   } else {
-    console.log(green(`  ✓ "${result.name}" agregada.\n`));
+    console.log(green(`  ✓ "${formatLocation(selected!)}" agregada.\n`));
   }
 
   await saveConfig(config);
