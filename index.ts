@@ -6,6 +6,7 @@ import { geocode } from "./src/geocoding";
 import { getWeather } from "./src/forecast";
 import { showMenu, showWeather } from "./src/menu";
 import { cyan, green, red } from "./src/colors";
+import { start as spinStart, stop as spinStop, run as spin } from "./src/spinner";
 
 async function loadConfig(): Promise<Config> {
   const configPath = getConfigPath("config.json");
@@ -42,7 +43,7 @@ async function handleDefaultWeather(config: Config): Promise<void> {
     console.log(red(`\n  ⚠ La ciudad "${config.defaultCity}" no está registrada.\n`));
     return;
   }
-  const temp = await getWeather(city.latitude, city.longitude);
+  const temp = await spin(`Obteniendo clima de ${city.name}...`, () => getWeather(city.latitude, city.longitude));
   if (temp === null) {
     console.log(red("\n  ⚠ No se pudo obtener el clima.\n"));
     return;
@@ -57,7 +58,9 @@ async function handleAllCitiesWeather(config: Config): Promise<void> {
   }
   console.log("");
   for (const city of config.cities) {
+    spinStart(`Obteniendo clima de ${city.name}...`);
     const temp = await getWeather(city.latitude, city.longitude);
+    spinStop();
     if (temp !== null) {
       const def = city.name === config.defaultCity ? " ★" : "";
       showWeather(`${city.name}${def}`, formatTemp(temp, config.units));
@@ -75,8 +78,7 @@ async function handleAddCity(config: Config): Promise<Config> {
     return config;
   }
 
-  console.log(`  Buscando "${name}"...`);
-  const results = await geocode(name.trim());
+  const results = await spin(`Buscando "${name}"...`, () => geocode(name.trim()));
   if (results.length === 0) {
     console.log(red("  ⚠ Ciudad no encontrada.\n"));
     return config;
