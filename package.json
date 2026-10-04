@@ -7,12 +7,14 @@
     "build": "bun test && bun build --compile src/index.ts --outfile weather",
     "start": "bun run src/index.ts",
     "dev": "bun run src/index.ts --watch",
-    "test": "bun test"
+    "test": "bun test",
+    "build:all": "bun test && bun build --compile src/index.ts --outfile weather-linux-x64 --target=bun-linux-x64 && bun build --compile src/index.ts --outfile weather-linux-arm64 --target=bun-linux-arm64 && bun build --compile src/index.ts --outfile weather-windows-x64.exe --target=bun-windows-x64 && bun build --compile src/index.ts --outfile weather-macos-x64 --target=bun-darwin-x64 && bun build --compile src/index.ts --outfile weather-macos-arm64 --target=bun-darwin-arm64"
   },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
-  }
+  },
+  "version": "1.0.0"
 }
