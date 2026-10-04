@@ -1,5 +1,7 @@
-const FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
-const FRAME_MS = 80;
+import { SPINNER_FRAMES, SPINNER_FRAME_MS } from "../utils/constants";
+
+const FRAMES = SPINNER_FRAMES;
+const FRAME_MS = SPINNER_FRAME_MS;
 
 let timer: ReturnType<typeof setInterval> | null = null;
 let frameIndex = 0;

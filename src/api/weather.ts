@@ -1,20 +1,8 @@
-import type { DailyForecast } from "./types";
+import type { DailyForecast } from "../types/Weather";
+import { FORECAST_API_URL, FORECAST_DAYS } from "../utils/constants";
 
-export async function getWeather(
-  latitude: number,
-  longitude: number
-): Promise<number | null> {
-  const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json() as {
-      current?: { temperature_2m?: number };
-    };
-    return data.current?.temperature_2m ?? null;
-  } catch {
-    return null;
-  }
+interface CurrentResponse {
+  current?: { temperature_2m?: number };
 }
 
 interface DailyResponse {
@@ -27,13 +15,30 @@ interface DailyResponse {
   };
 }
 
+export async function getWeather(
+  latitude: number,
+  longitude: number
+): Promise<number | null> {
+  const url =
+    `${FORECAST_API_URL}?latitude=${latitude}&longitude=${longitude}` +
+    `&current=temperature_2m`;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = (await res.json()) as CurrentResponse;
+    return data.current?.temperature_2m ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getDailyForecast(
   latitude: number,
   longitude: number,
-  days = 7
+  days = FORECAST_DAYS
 ): Promise<DailyForecast[]> {
   const url =
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}` +
+    `${FORECAST_API_URL}?latitude=${latitude}&longitude=${longitude}` +
     `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
     `&timezone=auto&forecast_days=${days}`;
   try {

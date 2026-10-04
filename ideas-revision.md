@@ -10,4 +10,4 @@
 - [ ] **Binario:** compila bien; revisar que `./weather` guarde datos en `~/.config/weather-cli/`.
 - [ ] **Tests:** no existen; conviene al menos probar storage y las APIs con mocks.
 - [x] **AGENTS.md:** ya no dice que `index.ts` es un stub; se actualizó con `spinner.ts`, `weather-codes.ts` y el endpoint `daily`.
-- [ ] **Prompt:** `src/readline.ts` crea y cierra una interfaz readline nueva por cada `prompt()`, así que con stdin no-TTY (pipes, tests) se pierde el resto del buffer de entrada. Afecta a `handleSettings` y a cualquier flujo de varias preguntas.
+- [ ] **Prompt:** `src/presentation/input.ts` crea y cierra una interfaz readline nueva por cada `prompt()`, así que con stdin no-TTY (pipes, tests) se pierde el resto del buffer de entrada. Afecta a `actions/settings.ts` y a cualquier flujo de varias preguntas.

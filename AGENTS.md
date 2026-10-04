@@ -4,17 +4,27 @@
 
 - **Bun only** — never use Node, npm, npx, yarn, pnpm, or vite.
   - Run: `bun <file>` | Install: `bun install` | Test: `bun test` | Type-check: `bunx tsc --noEmit`
-  - Build binary: `bun build --compile index.ts --outfile weather`
+  - Build binary: `bun build --compile src/index.ts --outfile weather`
   - Bun auto-loads `.env` files — no dotenv package needed.
 
 ## Project Structure
 
-- Entry point: `index.ts`. Modules in `src/` (`types.ts`, `storage.ts`, `geocoding.ts`, `forecast.ts`, `readline.ts`, `menu.ts`, `colors.ts`, `spinner.ts`, `weather-codes.ts`).
+Entry point: `src/index.ts`. Capas en `src/` (las dependencias fluyen en este orden: `types` ← `utils` ← `api`/`presentation` ← `storage` ← `actions` ← `index`).
+
+| Carpeta         | Responsabilidad                                                                                    |
+| --------------- | -------------------------------------------------------------------------------------------------- |
+| `types/`        | Contratos: `City.ts`, `Weather.ts` (`DailyForecast`, `Units`, `WeatherDescription`), `Config.ts`, `MenuOption.ts`, `index.ts` (barrel con `export type`). |
+| `utils/`        | `colors.ts`, `constants.ts` (URLs de la API, `DEFAULT_CONFIG`, `LINE`, frames del spinner), `format.ts` (`formatTemp`, `formatLocation`, `formatDate`, `defaultMarker`), `weather-codes.ts` (mapa WMO). |
+| `api/`          | `geocoding.ts`, `weather.ts`. Clientes HTTP de Open-Meteo; devuelven centinelas, nunca lanzan.        |
+| `storage/`      | `jsonStore.ts` (primitivas JSON + rutas), `citiesStorage.ts`, `settingsStorage.ts`.                 |
+| `presentation/` | `menu.ts` (vistas del menú), `output.ts` (mensajes al usuario), `input.ts` (prompts + validación), `spinner.ts`. |
+| `actions/`      | Un archivo por opción del menú: `getWeather.ts`, `getDailyForecast.ts`, `addCity.ts`, `removeCity.ts`, `setDefaultCity.ts`, `listCities.ts`, `settings.ts`. |
+
 - ESM (`"type": "module"`). Strict TypeScript with `verbatimModuleSyntax` — use explicit `type` keyword on type-only imports.
 
 ## Commands
 
-No scripts defined in `package.json` yet. Use direct Bun commands above.
+`bun run start` | `bun run dev` (watch) | `bun run build` (binario `weather`). Sin tests, linter ni CI.
 
 ## Config & Persistence
 
@@ -35,11 +45,12 @@ No scripts defined in `package.json` yet. Use direct Bun commands above.
 - TypeScript strict mode with `noFallthroughCasesInSwitch`, `noUncheckedIndexedAccess`, `noImplicitOverride` enabled.
 - Target: ESNext, module resolution: bundler mode.
 - Cursor rules in `.cursor/rules/` enforce Bun-native patterns — follow them.
-- **Colores ANSI** en `src/colors.ts`: `cyan()` (menú), `yellow()` (temperatura), `green()` (éxito ✓), `red()` (error ⚠). Sin dependencias externas.
-- **Los módulos de `src/` nunca lanzan excepciones.** Toda función de datos devuelve un centinela (`null` escalar, `[]` lista) y `index.ts` muestra el error con `red(...)`. Mantener ese contrato al añadir features.
-- **Presentación pura en `src/menu.ts`** (`show*`), **datos en `src/weather-codes.ts`** (mapa WMO → emoji + etiqueta en español). No mezclar.
-- `src/spinner.ts` tiene un timer singleton a nivel de módulo: no es concurrency-safe. Para varias peticiones en paralelo usar `spinStart`/`spinStop` alrededor de un `Promise.all`, no `spin.run`.
+- **Colores ANSI** en `src/utils/colors.ts`: `cyan()` (menú), `yellow()` (temperatura), `green()` (éxito ✓), `red()` (error ⚠). Sin dependencias externas.
+- **Los módulos de `src/` nunca lanzan excepciones.** Toda función de datos devuelve un centinela (`null` escalar, `[]` lista) y la capa que la consume muestra el error con `showError`/`showErrorBlock`. Mantener ese contrato al añadir features.
+- **Las `actions/` orquestan**: importan `api/`, `storage/` y `presentation/`, mutan el `Config` recibido y devuelven `Promise<void>`; `src/index.ts` se limita a armar el `Config` y despachar el `switch` de `MenuOption`.
+- **Presentación pura en `src/presentation/menu.ts`** (`showMenu`/`showWeather`/`showDailyForecast`), **mensajes en `presentation/output.ts`**, **datos WMO en `src/utils/weather-codes.ts`** (emoji + etiqueta en español). No mezclar.
+- `src/presentation/spinner.ts` tiene un timer singleton a nivel de módulo: no es concurrency-safe. Para varias peticiones en paralelo usar `spinStart`/`spinStop` alrededor de un `Promise.all`, no `spin.run`.
 
 ## Status
 
-CLI weather app implemented, including the 7-day forecast (menu option 6). No tests, linter, or CI configured yet.
+CLI weather app implemented, including the 7-day forecast (menu option 6). Structure refactored into `types`/`utils`/`api`/`storage`/`presentation`/`actions`. No tests, linter, or CI configured yet.

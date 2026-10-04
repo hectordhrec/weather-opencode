@@ -1,6 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 import * as os from "node:os";
+import { CONFIG_FILE_NAME } from "../utils/constants";
 
 const CONFIG_DIR = path.join(os.homedir(), ".config", "weather-cli");
 
@@ -8,7 +9,7 @@ export function getConfigDir(): string {
   return CONFIG_DIR;
 }
 
-export function getConfigPath(filename: string): string {
+export function getConfigPath(filename: string = CONFIG_FILE_NAME): string {
   return path.join(CONFIG_DIR, filename);
 }
 

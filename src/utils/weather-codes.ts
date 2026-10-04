@@ -1,7 +1,4 @@
-export interface WeatherDescription {
-  emoji: string;
-  label: string;
-}
+import type { WeatherDescription } from "../types/Weather";
 
 const UNKNOWN: WeatherDescription = { emoji: "❓", label: "Desconocido" };
 
