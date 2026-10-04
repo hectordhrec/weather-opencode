@@ -3,8 +3,13 @@ import { DEFAULT_CONFIG } from "./src/types";
 import { getConfigPath, loadJson, saveJson } from "./src/storage";
 import { prompt } from "./src/readline";
 import { geocode } from "./src/geocoding";
-import { getWeather } from "./src/forecast";
-import { showMenu, showWeather } from "./src/menu";
+import { getWeather, getDailyForecast } from "./src/forecast";
+import {
+  showMenu,
+  showWeather,
+  showDailyForecast,
+  showDailyForecastError,
+} from "./src/menu";
 import { cyan, green, red } from "./src/colors";
 import { start as spinStart, stop as spinStop, run as spin } from "./src/spinner";
 
@@ -67,6 +72,28 @@ async function handleAllCitiesWeather(config: Config): Promise<void> {
     } else {
       console.log(red(`  ${city.name}: Error al obtener clima`));
     }
+  }
+  console.log("");
+}
+
+async function handleDailyForecast(config: Config): Promise<void> {
+  if (config.cities.length === 0) {
+    console.log(red("\n  ⚠ No hay ciudades registradas.\n"));
+    return;
+  }
+  spinStart(`Obteniendo pronósticos de ${config.cities.length} ciudades...`);
+  const forecasts = await Promise.all(
+    config.cities.map((city) => getDailyForecast(city.latitude, city.longitude))
+  );
+  spinStop();
+  for (const [i, city] of config.cities.entries()) {
+    const days = forecasts[i] ?? [];
+    const def = city.name === config.defaultCity ? " ★" : "";
+    if (days.length === 0) {
+      showDailyForecastError(`${city.name}${def}`);
+      continue;
+    }
+    showDailyForecast(`${formatLocation(city)}${def}`, days, config.units);
   }
   console.log("");
 }
@@ -228,6 +255,9 @@ async function main(): Promise<void> {
         break;
       case "5":
         config = await handleSetDefault(config);
+        break;
+      case "6":
+        await handleDailyForecast(config);
         break;
       case "8":
         config = await handleSettings(config);
