@@ -3,19 +3,18 @@ import * as path from "node:path";
 import * as os from "node:os";
 import { CONFIG_FILE_NAME } from "../utils/constants";
 
-const CONFIG_DIR = path.join(os.homedir(), ".config", "weather-cli");
-
 export function getConfigDir(): string {
-  return CONFIG_DIR;
+  return path.join(os.homedir(), ".config", "weather-cli");
 }
 
 export function getConfigPath(filename: string = CONFIG_FILE_NAME): string {
-  return path.join(CONFIG_DIR, filename);
+  return path.join(getConfigDir(), filename);
 }
 
 export async function ensureConfigDir(): Promise<void> {
-  if (!fs.existsSync(CONFIG_DIR)) {
-    fs.mkdirSync(CONFIG_DIR, { recursive: true });
+  const dir = getConfigDir();
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 }
 
